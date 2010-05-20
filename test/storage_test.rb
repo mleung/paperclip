@@ -184,6 +184,17 @@ class StorageTest < Test::Unit::TestCase
           assert true
         end
       end
+      
+      context "and saved when bucket doesn't exist" do
+        setup do
+          AWS::S3::S3Object.stubs(:store).with(@dummy.avatar.path, anything, 'whatever', :content_type => 'image/png', :access => :public_read).raises(AWS::S3::NoSuchBucket)
+          @dummy.save
+        end
+        
+        should "create the bucket automatically and not cause any trouble" do
+          assert true
+        end
+      end
 
       context "and remove" do
         setup do

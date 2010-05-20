@@ -209,13 +209,16 @@ module Paperclip
                                     {:content_type => instance_read(:content_type),
                                      :access => @s3_permissions,
                                     }.merge(@s3_headers))
+          rescue AWS::S3::NoSuchBucket => e
+            AWS::S3::Bucket.create(bucket_name)
+            retry
           rescue AWS::S3::ResponseError => e
             raise
           end
         end
         @queued_for_write = {}
       end
-
+      
       def flush_deletes #:nodoc:
         @queued_for_delete.each do |path|
           begin
